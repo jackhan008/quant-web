@@ -3,20 +3,23 @@
 import { useState } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { getCurrencySymbol } from '@/lib/utils';
+import { translations, Language } from '@/lib/translations';
 
-export default function MarketGrid({ initialData }: { initialData: any[] }) {
+export default function MarketGrid({ initialData, lang = 'en' }: { initialData: any[], lang?: Language }) {
     const [filter, setFilter] = useState('ALL');
+    const t = translations[lang];
 
     const categories = [
-        { id: 'ALL', label: 'All Stocks' },
-        { id: 'STRONG BUY', label: 'Strong Buy' },
-        { id: 'BUY', label: 'Buy' },
-        { id: 'ACCUMULATE', label: 'Accumulate' },
-        { id: 'HOLD', label: 'Hold' },
-        { id: 'REDUCE', label: 'Reduce/Sell' }
+        { id: 'ALL', label: t.allStocks },
+        { id: 'STRONG BUY', label: t.strongBuy },
+        { id: 'BUY', label: t.buy },
+        { id: 'ACCUMULATE', label: t.accumulate },
+        { id: 'HOLD', label: t.hold },
+        { id: 'REDUCE', label: t.reduceSell }
     ];
 
     const filteredData = initialData.filter((stock: any) => {
+        if (!stock) return false;
         if (filter === 'ALL') return true;
         if (filter === 'REDUCE') return stock.strategy === 'REDUCE' || stock.strategy === 'SELL';
         return stock.strategy === filter;
@@ -42,6 +45,8 @@ export default function MarketGrid({ initialData }: { initialData: any[] }) {
                 {filteredData.length > 0 ? (
                     filteredData.map((stock: any) => {
                         const isPositive = stock.change >= 0;
+                        const localizedStrategy = (t as any)[stock.strategy] || stock.strategy;
+
                         return (
                             <a
                                 key={stock.symbol}
@@ -55,7 +60,7 @@ export default function MarketGrid({ initialData }: { initialData: any[] }) {
                                                 stock.strategy === 'HOLD' ? 'bg-slate-500 text-white' :
                                                     'bg-red-500 text-white'
                                         }`}>
-                                        {stock.strategy}
+                                        {localizedStrategy}
                                     </div>
                                 )}
 
@@ -77,7 +82,7 @@ export default function MarketGrid({ initialData }: { initialData: any[] }) {
                     })
                 ) : (
                     <div className="col-span-full py-20 text-center text-gray-500 glass-panel">
-                        No stocks currently match the "{categories.find(c => c.id === filter)?.label}" criteria.
+                        {t.noMatch}
                     </div>
                 )}
             </div>

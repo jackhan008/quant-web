@@ -280,7 +280,7 @@ async function getUnifiedStrategyData(symbol: string) {
     }
 }
 
-export async function getStockAnalysis(symbol: string): Promise<StockAnalysis | null> {
+export async function getStockAnalysis(symbol: string, lang: 'en' | 'zh' = 'en'): Promise<StockAnalysis | null> {
     try {
         const unified = await getUnifiedStrategyData(symbol);
         if (!unified) return null;
@@ -344,12 +344,14 @@ const queryOptions = { validateResult: false };
 
 export async function getMarketOverview() {
     const tickers = [
-        // US Tech Giants (Magnificent Seven & Semis)
-        'AAPL', 'NVDA', 'TSLA', 'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD', 'AVGO', 'INTC',
-        // HK / China Giants
-        '0700.HK', '9988.HK', '3690.HK', '1024.HK', '9618.HK', '9888.HK', '1810.HK', '1211.HK', '2015.HK', '9866.HK',
-        // Finance & Blue Chips
-        'V', 'MA', 'PYPL', 'CRM', 'ORCL', 'DIS', 'NKE', '0005.HK', '2318.HK', '3968.HK'
+        // US Tech Giants
+        'AAPL', 'NVDA', 'TSLA', 'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD', 'AVGO', 'NFLX',
+        // HK Market Leaders
+        '0700.HK', '9988.HK', '3690.HK', '1810.HK', '1024.HK', '9618.HK', '9888.HK', '0388.HK', '0941.HK', '1211.HK', '2318.HK', '1398.HK', '0939.HK', '3968.HK', '2269.HK', '0005.HK',
+        // A-Share (China Mainland)
+        '600519.SS', '300750.SZ', '000858.SZ', '601318.SS', '600036.SS', '002594.SZ', '600900.SS', '601012.SS', '000001.SZ', '601857.SS',
+        // Global Giants
+        'V', 'MA', 'DIS', 'NKE', 'CRM', 'ORCL', 'ASML', 'TSM'
     ];
 
     const promises = tickers.map(async (t) => {
@@ -369,3 +371,4 @@ export async function getMarketOverview() {
     const results = await Promise.all(promises);
     return results.filter(Boolean);
 }
+

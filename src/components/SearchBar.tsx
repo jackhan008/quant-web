@@ -4,14 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Loader2, X } from 'lucide-react';
 import { getStockSuggestions } from '@/app/actions';
+import { translations, Language, stockNameMap } from '@/lib/translations';
 
-export default function SearchBar() {
+export default function SearchBar({ lang = 'en' }: { lang?: Language }) {
     const [query, setQuery] = useState('');
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const router = useRouter();
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const t = translations[lang];
 
     // Debounced search logic
     useEffect(() => {
@@ -71,7 +73,7 @@ export default function SearchBar() {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onFocus={() => query.length >= 2 && setShowDropdown(true)}
-                        placeholder="Search symbol (e.g. 0700.HK, NVDA)"
+                        placeholder={t.searchPlaceholder}
                         className="search-input"
                     />
 
@@ -88,7 +90,7 @@ export default function SearchBar() {
                     {/* Dropdown Suggestions */}
                     {showDropdown && suggestions.length > 0 && (
                         <div className="search-dropdown">
-                            {suggestions.map((s) => (
+                            {suggestions.map((s: any) => (
                                 <div
                                     key={s.symbol}
                                     className="search-item"
@@ -96,7 +98,7 @@ export default function SearchBar() {
                                 >
                                     <div className="flex flex-col">
                                         <span className="symbol">{s.symbol}</span>
-                                        <span className="name">{s.name}</span>
+                                        <span className="name">{(stockNameMap[lang][s.symbol] || s.name)}</span>
                                     </div>
                                     <span className="exch">{s.exch}</span>
                                 </div>
@@ -107,7 +109,7 @@ export default function SearchBar() {
                     {/* No Results Fallback */}
                     {showDropdown && query.length >= 2 && !isLoading && suggestions.length === 0 && (
                         <div className="search-dropdown p-4 text-center text-gray-500 text-sm">
-                            No ticker found for "{query}"
+                            {t.noTicker} "{query}"
                         </div>
                     )}
                 </div>
@@ -117,7 +119,7 @@ export default function SearchBar() {
                     disabled={suggestions.length === 0 || isLoading}
                     className="search-btn"
                 >
-                    {isLoading ? 'Searching...' : 'Analyze Now'}
+                    {isLoading ? t.searching : t.analyzeNow}
                 </button>
             </div>
         </form>
